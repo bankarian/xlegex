@@ -26,20 +26,27 @@ enum Status {
   Removed,
 }
 
+/**
+ * A backtracing log for the go-back feature
+ */
+type EventLog = {
+  node: CardNode?;
+  preEventLog: EventLog?;
+};
+
 interface GameConfig {
-  container: HTMLElement;
   levelCount: number;
   nodeCount: number;
 }
 
 interface GameContext {
-    nodes: CardNode[]
-    selectedNodes: CardNode[]
-    removedNodes: CardNode[]
-    canBack: boolean
-    canUnblockFirstThree: boolean
+  nodes: CardNode[];
+  selectedNodes: CardNode[];
+  removedNodes: CardNode[];
+  canBack: boolean;
+  canUnblockFirstThree: boolean;
 
-    onSelect: (node: CardNode) => void
-    onBack: () => void
-    onUnblockFirstThree: () => void
+  onSelect: (node: CardNode) => void;
+  onBack: () => void;
+  onUnblockFirstThree: () => void;
 }
