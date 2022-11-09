@@ -1,16 +1,17 @@
 import React from "react";
+import { T } from "../types/type";
 
-export const useGameContext = (initNodes: CardNode[]): GameContext => {
-  const [nodes, useNodes] = React.useState<CardNode[]>(initNodes);
+export const useGameContext = (config: T.GameConfig): T.GameContext => {
+  const [nodes, useNodes] = React.useState<T.CardNode[]>([]);
 
   // The selected nodes are organized as a FILO stack
-  const [selectedStack, useSelectStack] = React.useState<CardNode[]>([]);
-  const [removedNodes, useRemoveNodes] = React.useState<CardNode[]>([]);
+  const [selectedStack, useSelectStack] = React.useState<T.CardNode[]>([]);
+  const [removedNodes, useRemoveNodes] = React.useState<T.CardNode[]>([]);
   const [canBack, useCanBack] = React.useState<boolean>(true);
   const [canUnblockFirstThree, useCanUnblockFirstThree] =
     React.useState<boolean>(true);
 
-  const onSelect = (node: CardNode) => {
+  const onSelect = (node: T.CardNode) => {
     useNodes((pre) => pre.filter((e) => e !== node));
     useSelectStack((pre) => [...pre, node]);
   };
@@ -28,6 +29,10 @@ export const useGameContext = (initNodes: CardNode[]): GameContext => {
     useCanBack(false);
   };
 
+  const onInitialize = () => {
+    // TODO: generate nodes here
+  }
+
   // TODO: impl
   const onUnblockFirstThree = () => {};
 
@@ -40,5 +45,6 @@ export const useGameContext = (initNodes: CardNode[]): GameContext => {
     onSelect,
     onBack,
     onUnblockFirstThree,
+    onInitialize,
   };
 };

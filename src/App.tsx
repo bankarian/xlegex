@@ -1,5 +1,8 @@
+import React from "react";
+import { Playground } from "./components/Playground";
+
 function App() {
-  return <div className="App">{"Hello World"}</div>;
+  return <Playground />;
 }
 
 export default App;
