@@ -2,7 +2,7 @@ export namespace T {
   export type CardNode = {
     index: number;
     level: number;
-    keyPoint: Point;
+    layout: Layout;
     position: Position;
     value: number; // value for matching
     viewUrl: string;
@@ -10,9 +10,9 @@ export namespace T {
     parents: CardNode[];
   };
   
-  export type Point = {
-    x: number;
-    y: number;
+  export type Layout = {
+    left: number;
+    top: number;
   };
   
   export type Position = {
