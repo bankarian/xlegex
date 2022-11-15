@@ -2,24 +2,21 @@ import { makeStyles } from "@mui/styles";
 import React from "react";
 import { T } from "../types/type";
 
-/**
- * TODO: the style doesn't work in the func-style
- */
 const useStyles = makeStyles({
   container: {
-    position: "relative",
+    position: "absolute",
     display: "flex",
   },
   img: {
-    width: 60,
-    height: 60,
+    width: 40,
+    height: 40,
     background: "blue",
   },
   mask: {
     background: "black",
     opacity: 0.5,
-    width: 60,
-    height: 60,
+    width: 40,
+    height: 40,
     zIndex: 1,
     position: "absolute",
   },

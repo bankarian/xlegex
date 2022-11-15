@@ -31,6 +31,7 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
 
   const onInitialize = () => {
     // TODO: generate nodes here
+    
   }
 
   // TODO: impl
