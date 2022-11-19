@@ -1,9 +1,7 @@
+import { makeStyles } from "@mui/styles";
 import React from "react";
 import { useGameContext } from "../hooks/useGameContext";
-import { T } from "../types/type";
 import { Card } from "./Card";
-import { makeStyles } from "@mui/styles";
-import views from "../assets/cards/index";
 
 const useStyles = makeStyles({
   pool: {},
@@ -20,41 +18,26 @@ export const Playground: React.FC = () => {
     removedNodes,
     canBack,
     canUnblockFirstThree,
-    ...callbacks
-  } = useGameContext({ levelCount: 3 });
-
-  
+    ...props
+  } = useGameContext({
+    expectedLevelCount: 5,
+    containerWidth: 400,
+    containerHeight: 400,
+    typeCount: 6,
+    cardSize: 40,
+  });
 
   const styles = useStyles();
 
+  React.useEffect(() => {
+    props.onInitialize();
+  }, []);
+
   return (
     <div className={styles.pool}>
-      <Card
-        node={{
-          index: 0,
-          level: 0,
-          viewUrl: views.p1,
-          layout: { left: 40, top: 40 },
-          position: { row: 0, col: 0 },
-          value: 0,
-          status: T.Status.Frozen,
-          parents: [],
-        }}
-        onClick={() => {}}
-      />
-      <Card
-        node={{
-          index: 0,
-          level: 0,
-          viewUrl: views.p1,
-          layout: { left: 60, top: 60 },
-          position: { row: 0, col: 0 },
-          value: 0,
-          status: T.Status.Frozen,
-          parents: [],
-        }}
-        onClick={() => {}}
-      />
+      {nodes.map((n) => (
+        <Card node={n} onClick={() => props.onSelect(n)} />
+      ))}
     </div>
   );
 };

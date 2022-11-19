@@ -6,17 +6,14 @@ const useStyles = makeStyles({
   container: {
     position: "absolute",
     display: "flex",
+    background: "cyan",
+    border: "solid 0.5px",
   },
   img: {
-    width: 40,
-    height: 40,
     background: "blue",
   },
   mask: {
     background: "black",
-    opacity: 0.5,
-    width: 40,
-    height: 40,
     zIndex: 1,
     position: "absolute",
   },
@@ -35,10 +32,31 @@ export const Card: React.FC<{
         zIndex: node.level,
         left: node.layout.left,
         top: node.layout.top,
+        width: node.size,
+        height: node.size,
       }}
     >
-      <img src={node.viewUrl} className={styles.img} alt="" />
-      <div className={styles.mask} />
+      {node.viewUrl ? (
+        <img
+          src={node.viewUrl}
+          className={styles.img}
+          alt=""
+          style={{
+            width: node.size,
+            height: node.size,
+          }}
+        />
+      ) : (
+        node.name
+      )}
+      <div
+        className={styles.mask}
+        style={{
+          opacity: node.status === T.Status.Clickable ? 0 : 0.5,
+          width: node.size,
+          height: node.size,
+        }}
+      />
     </div>
   );
 };
