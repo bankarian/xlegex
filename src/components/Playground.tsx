@@ -7,10 +7,6 @@ const useStyles = makeStyles({
   pool: {},
 });
 
-/**
- * TODO: generate card pool
- */
-
 export const Playground: React.FC = () => {
   const {
     nodes,
