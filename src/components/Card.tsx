@@ -13,6 +13,7 @@ const useStyles = makeStyles({
     zIndex: props.level,
     left: props.layout.left,
     top: props.layout.top,
+    cursor: "pointer",
   }),
   img: (props: T.CardNode) => ({
     background: "blue",

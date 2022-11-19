@@ -1,16 +1,16 @@
 export namespace T {
   export type CardNode = {
     /** levelIndex is for generating position for the node on its level */
-    levelIndex: number; 
+    levelIndex: number;
     /** name is used for debugging */
-    name: string; 
+    name: string;
     level: number;
     layout: Layout;
     position: Position;
     type: number;
     viewUrl: string;
     status: Status;
-    parents: CardNode[];
+    overlaps: CardNode[];
     size: number;
   };
 
@@ -45,6 +45,7 @@ export namespace T {
     cardSize: number;
     containerWidth: number;
     containerHeight: number;
+    stackDepth: number;
   }
 
   export interface GameContext {

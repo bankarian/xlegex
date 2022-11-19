@@ -1,11 +1,10 @@
 import { floor, random, shuffle } from "lodash";
 import React from "react";
 import { T } from "../types/type";
+import { containsByAssert, containsByKey } from "../utils";
 
 export const useGameContext = (config: T.GameConfig): T.GameContext => {
   const [nodes, useNodes] = React.useState<T.CardNode[]>([]);
-
-  // The selected nodes are organized as a FILO stack
   const [selectedStack, useSelectStack] = React.useState<T.CardNode[]>([]);
   const [removedNodes, useRemoveNodes] = React.useState<T.CardNode[]>([]);
   const [canBack, useCanBack] = React.useState<boolean>(true);
@@ -14,7 +13,22 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
   >(false);
 
   const onSelect = (node: T.CardNode) => {
-    useNodes((pre) => pre.filter((e) => e !== node));
+    if (node.status !== T.Status.Clickable) {
+      return;
+    }
+    useNodes((pre) =>
+      pre
+        .filter((o) => o.name !== node.name)
+        .map((o) => {
+          if (containsByKey(o.overlaps, node, "name")) {
+            o.overlaps = o.overlaps.filter((e) => e.name !== node.name);
+            if (o.overlaps.length === 0) {
+              o.status = T.Status.Clickable;
+            }
+          }
+          return o;
+        })
+    );
     useSelectStack((pre) => [...pre, node]);
   };
 
@@ -66,12 +80,16 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
       },
     ];
 
-    preLevel.forEach((n) => {
-      const overlap = keyPoints.filter(
-        (p) => p.left === n.layout.left && p.top === n.layout.top
-      );
-      if (overlap.length > 0) {
-        n.status = T.Status.Frozen;
+    preLevel.forEach((o) => {
+      if (
+        containsByAssert(
+          keyPoints,
+          o.layout,
+          (a, b) => a.left === b.left && a.top === b.top
+        )
+      ) {
+        o.overlaps.push(node);
+        o.status = T.Status.Frozen;
       }
     });
   };
@@ -139,8 +157,8 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
           type: k,
           viewUrl: "", // TODO: link url with 'type'
           status: T.Status.Clickable,
-          parents: [],
-          size: cardSize
+          overlaps: [],
+          size: cardSize,
         };
         linkOverlap(node, preLevel);
         return node;
