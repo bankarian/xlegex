@@ -32,6 +32,26 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
     }
   }, [selectedStack, backChances]);
 
+  useEffect(() => {
+    /**
+     * check the last three element to see if they are matched
+     */
+    if (selectedStack.length < config.matchCount) {
+      return;
+    }
+    const slice = selectedStack.slice(-config.matchCount);
+    let matched = true;
+    for (let i = 1; i < slice.length; i++) {
+      if (slice[i].type !== slice[i - 1].type) {
+        matched = false;
+        break;
+      }
+    }
+    if (matched) {
+      useSelectedStack((pre) => pre.slice(0, pre.length - config.matchCount));
+    }
+  }, [selectedStack]);
+
   const stackIsFull = <T>(stack: T[], depth: number): boolean => {
     return stack.length === depth;
   };

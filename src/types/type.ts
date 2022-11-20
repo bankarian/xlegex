@@ -48,6 +48,7 @@ export namespace T {
     stackDepth: number;
     unblockChances: number;
     backChances: number;
+    matchCount: number;
   }
 
   export interface GameContext {

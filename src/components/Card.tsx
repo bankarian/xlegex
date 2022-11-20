@@ -40,7 +40,7 @@ export const Card: React.FC<{
       {node.viewUrl ? (
         <img src={node.viewUrl} className={styles.img} alt="" />
       ) : (
-        node.name
+        `${node.name}, ${node.type}`
       )}
       <div className={styles.mask} />
     </div>

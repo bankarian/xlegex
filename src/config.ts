@@ -8,7 +8,8 @@ const config: T.GameConfig = {
   cardSize: 40,
   stackDepth: 10,
   unblockChances: 1,
-  backChances: 1
+  backChances: 1,
+  matchCount: 3,
 };
 
 export default config;
