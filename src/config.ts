@@ -6,7 +6,9 @@ const config: T.GameConfig = {
   containerHeight: 400,
   typeCount: 4,
   cardSize: 40,
-  stackDepth: 10
+  stackDepth: 10,
+  unblockChances: 1,
+  backChances: 1
 };
 
 export default config;

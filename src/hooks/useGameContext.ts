@@ -1,19 +1,46 @@
 import { floor, random, shuffle } from "lodash";
-import React from "react";
+import { useEffect, useState } from "react";
 import { T } from "../types/type";
-import { containsByAssert, containsByKey } from "../utils";
+import { containsByAssert, containsByKey } from "../utils/utils";
 
 export const useGameContext = (config: T.GameConfig): T.GameContext => {
-  const [nodes, useNodes] = React.useState<T.CardNode[]>([]);
-  const [selectedStack, useSelectStack] = React.useState<T.CardNode[]>([]);
-  const [removedNodes, useRemoveNodes] = React.useState<T.CardNode[]>([]);
-  const [canBack, useCanBack] = React.useState<boolean>(true);
-  const [canUnblockFirstThree, useCanUnblockFirstThree] = React.useState<
-    boolean
-  >(false);
+  const [nodes, useNodes] = useState<T.CardNode[]>([]);
+  const [selectedStack, useSelectedStack] = useState<T.CardNode[]>([]);
+  const [unblockedNodes, useUnblockedNodes] = useState<T.CardNode[]>([]);
+  const [canBack, useCanBack] = useState<boolean>(false);
+  const [canUnblockFirstThree, useCanUnblockFirstThree] = useState<boolean>(
+    false
+  );
+  const [unblockChances, useUnblockChances] = useState<number>(
+    config.unblockChances
+  );
+  const [backChances, useBackChances] = useState<number>(config.backChances);
+
+  useEffect(() => {
+    if (unblockChances && selectedStack.length > 2) {
+      useCanUnblockFirstThree(true);
+    } else {
+      useCanUnblockFirstThree(false);
+    }
+  }, [selectedStack, unblockChances]);
+
+  useEffect(() => {
+    if (backChances && selectedStack.length > 0) {
+      useCanBack(true);
+    } else {
+      useCanBack(false);
+    }
+  }, [selectedStack, backChances]);
+
+  const stackIsFull = <T>(stack: T[], depth: number): boolean => {
+    return stack.length === depth;
+  };
 
   const onSelect = (node: T.CardNode) => {
-    if (node.status !== T.Status.Clickable) {
+    if (
+      node.status !== T.Status.Clickable ||
+      stackIsFull(selectedStack, config.stackDepth)
+    ) {
       return;
     }
     useNodes((pre) =>
@@ -29,7 +56,7 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
           return o;
         })
     );
-    useSelectStack((pre) => [...pre, node]);
+    useSelectedStack((pre) => [...pre, node]);
   };
 
   const onBack = () => {
@@ -37,17 +64,35 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
       return;
     }
     const node = selectedStack[selectedStack.length - 1];
-    useNodes((pre) => [...pre, node]);
-    useSelectStack((pre) => {
-      pre.pop();
-      return pre;
+    useNodes((pre) => {
+      // update overlapping status for pre
+      pre.forEach((o) => {
+        if (o.level !== node.level - 1) {
+          return;
+        }
+        const keyPoints = keyPointsOf(o);
+        if (
+          containsByAssert(
+            keyPoints,
+            node.layout,
+            (a, b) => a.left === b.left && a.top === b.top
+          )
+        ) {
+          o.overlaps.push(node);
+          o.status = T.Status.Frozen;
+        }
+      });
+
+      // insert node
+      return [...pre, node];
     });
-    useCanBack(false);
+    useSelectedStack((pre) => pre.slice(0, pre.length - 1));
+    useBackChances((pre) => pre - 1);
   };
 
   const resetContext = () => {
-    useSelectStack([]);
-    useRemoveNodes([]);
+    useSelectedStack([]);
+    useUnblockedNodes([]);
     useCanBack(true);
     useCanUnblockFirstThree(false);
   };
@@ -58,10 +103,9 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
     return random(minCount, maxCount + 1);
   };
 
-  /** Deal with the overlapping relation for nodes in pre-level */
-  const linkOverlap = (node: T.CardNode, preLevel: T.CardNode[]) => {
+  const keyPointsOf = (node: T.CardNode): T.Layout[] => {
     const offset = config.cardSize / 2;
-    const keyPoints: T.Layout[] = [
+    return [
       {
         left: node.layout.left + offset,
         top: node.layout.top + offset,
@@ -79,6 +123,11 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
         top: node.layout.top - offset,
       },
     ];
+  };
+
+  /** Deal with the overlapping relation for nodes in pre-level */
+  const linkOverlap = (node: T.CardNode, preLevel: T.CardNode[]) => {
+    const keyPoints: T.Layout[] = keyPointsOf(node);
 
     preLevel.forEach((o) => {
       if (
@@ -173,12 +222,19 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
   };
 
   // TODO: impl
-  const onUnblockFirstThree = () => {};
+  const onUnblockFirstThree = () => {
+    if (!canUnblockFirstThree) {
+      return;
+    }
+    useUnblockedNodes(selectedStack.slice(0, 3));
+    useUnblockChances((pre) => pre - 1);
+    useSelectedStack(selectedStack.slice(3));
+  };
 
   return {
     nodes,
     selectedNodes: selectedStack,
-    removedNodes,
+    unblockedNodes,
     canBack,
     canUnblockFirstThree,
     onSelect,

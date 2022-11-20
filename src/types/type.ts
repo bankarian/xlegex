@@ -46,12 +46,14 @@ export namespace T {
     containerWidth: number;
     containerHeight: number;
     stackDepth: number;
+    unblockChances: number;
+    backChances: number;
   }
 
   export interface GameContext {
     nodes: CardNode[];
     selectedNodes: CardNode[];
-    removedNodes: CardNode[];
+    unblockedNodes: CardNode[];
     canBack: boolean;
     canUnblockFirstThree: boolean;
 
