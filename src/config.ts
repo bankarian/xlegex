@@ -1,7 +1,7 @@
 import { T } from "./types/type";
 
 const config: T.GameConfig = {
-  expectedLevelCount: 3,
+  expectedLevelCount: 1,
   containerWidth: 400,
   containerHeight: 400,
   typeCount: 4,

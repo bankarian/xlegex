@@ -26,7 +26,7 @@ const useStyles = makeStyles({
     position: "absolute",
     width: props.size,
     height: props.size,
-    opacity: props.status === T.Status.Clickable ? 0 : 0.5,
+    opacity: props.status === T.CardStatus.Clickable ? 0 : 0.5,
   }),
 });
 

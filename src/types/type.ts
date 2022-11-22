@@ -9,7 +9,7 @@ export namespace T {
     position: Position;
     type: number;
     viewUrl: string;
-    status: Status;
+    status: CardStatus;
     overlaps: CardNode[];
     size: number;
   };
@@ -24,11 +24,17 @@ export namespace T {
     col: number;
   };
 
-  export enum Status {
+  export enum CardStatus {
     Clickable,
     Frozen,
     Selected,
     Removed,
+  }
+
+  export enum GameStatus {
+    InProgress,
+    Win,
+    Lose,
   }
 
   /**
@@ -57,6 +63,7 @@ export namespace T {
     unblockedNodes: CardNode[];
     canBack: boolean;
     canUnblockFirstThree: boolean;
+    gameStatus: GameStatus;
 
     onSelect: (node: CardNode) => void;
     onBack: () => void;

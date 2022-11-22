@@ -1,5 +1,5 @@
 import { makeStyles } from "@mui/styles";
-import React from "react";
+import React, { useEffect } from "react";
 import config from "../config";
 import { useGameContext } from "../hooks/useGameContext";
 import { Card } from "./Card";
@@ -17,6 +17,7 @@ export const Playground: React.FC = () => {
     unblockedNodes,
     canBack,
     canUnblockFirstThree,
+    gameStatus,
     ...props
   } = useGameContext(config);
 
@@ -25,6 +26,10 @@ export const Playground: React.FC = () => {
   React.useEffect(() => {
     props.onInitialize();
   }, []);
+
+  useEffect(() => {
+    console.log(nodes);
+  }, [nodes]);
 
   return (
     <div className={styles.pool}>
@@ -41,8 +46,13 @@ export const Playground: React.FC = () => {
       >
         Unblock first three
       </Button>
-      <div>{`selected: ${selectedNodes.map((o) => o.name + ", ")}`}</div>
-      <div>{`unblocked: ${unblockedNodes.map((o) => o.name + ", ")}`}</div>
+      <div>{`selected: ${selectedNodes.map(
+        (o) => o.name + ":" + o.type + ", "
+      )}`}</div>
+      <div>{`unblocked: ${unblockedNodes.map(
+        (o) => o.name + ":" + o.type + ", "
+      )}`}</div>
+      <div>{`Game Status: ${gameStatus}`}</div>
     </div>
   );
 };

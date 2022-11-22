@@ -15,6 +15,9 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
     config.unblockChances
   );
   const [backChances, useBackChances] = useState<number>(config.backChances);
+  const [gameStatus, useGameStatus] = useState<T.GameStatus>(
+    T.GameStatus.InProgress
+  );
 
   useEffect(() => {
     if (unblockChances && selectedStack.length > 2) {
@@ -52,13 +55,29 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
     }
   }, [selectedStack]);
 
+  /** Checker for win & lose */
+  useEffect(() => {
+    if (selectedStack.length === config.stackDepth || nodes.length === 0) {
+      // stack is full or no node in pool
+      !canBack && !canUnblockFirstThree && useGameStatus(T.GameStatus.Lose);
+    } else if (
+      nodes.length === 0 &&
+      selectedStack.length === 0 &&
+      unblockedNodes.length === 0
+    ) {
+      useGameStatus(T.GameStatus.Win);
+    }
+    // game is still in progress
+    useGameStatus(T.GameStatus.InProgress);
+  }, [selectedStack, nodes, unblockedNodes]);
+
   const stackIsFull = <T>(stack: T[], depth: number): boolean => {
     return stack.length === depth;
   };
 
   const onSelect = (node: T.CardNode) => {
     if (
-      node.status !== T.Status.Clickable ||
+      node.status !== T.CardStatus.Clickable ||
       stackIsFull(selectedStack, config.stackDepth)
     ) {
       return;
@@ -70,7 +89,7 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
           if (containsByKey(o.overlaps, node, "name")) {
             o.overlaps = o.overlaps.filter((e) => e.name !== node.name);
             if (o.overlaps.length === 0) {
-              o.status = T.Status.Clickable;
+              o.status = T.CardStatus.Clickable;
             }
           }
           return o;
@@ -99,7 +118,7 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
           )
         ) {
           o.overlaps.push(node);
-          o.status = T.Status.Frozen;
+          o.status = T.CardStatus.Frozen;
         }
       });
 
@@ -158,7 +177,7 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
         )
       ) {
         o.overlaps.push(node);
-        o.status = T.Status.Frozen;
+        o.status = T.CardStatus.Frozen;
       }
     });
   };
@@ -174,7 +193,7 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
     resetContext();
 
     // 1. Generate all item: count = typeCount * 3 * expectedLevelCount
-    const types = new Array(typeCount).fill(0).map((_, i) => i + 1);
+    const types = new Array(typeCount).fill(0).map((_, i) => i);
     let items: number[] = [];
     for (let i = 0; i < expectedLevelCount; i++) {
       items = [...items, ...types, ...types, ...types];
@@ -208,6 +227,7 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
         while (memo.has(levelIndex)) {
           levelIndex = random(0, len * len);
         }
+        memo.add(levelIndex);
         const row = floor(levelIndex / len),
           col = levelIndex % len;
 
@@ -225,7 +245,7 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
           },
           type: k,
           viewUrl: "", // TODO: link url with 'type'
-          status: T.Status.Clickable,
+          status: T.CardStatus.Clickable,
           overlaps: [],
           size: cardSize,
         };
@@ -241,7 +261,6 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
     useNodes(src);
   };
 
-  // TODO: impl
   const onUnblockFirstThree = () => {
     if (!canUnblockFirstThree) {
       return;
@@ -257,6 +276,8 @@ export const useGameContext = (config: T.GameConfig): T.GameContext => {
     unblockedNodes,
     canBack,
     canUnblockFirstThree,
+    gameStatus,
+
     onSelect,
     onBack,
     onUnblockFirstThree,
